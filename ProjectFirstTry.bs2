@@ -1,0 +1,67 @@
+' ProjectFirstTry.bs2
+
+' {$STAMP BS2}
+' {$PBASIC 2.5}
+
+irDetectSide  VAR Bit
+irDetectBehind VAR Bit
+pulseCount VAR Byte
+
+DO
+  FREQOUT 2, 1, 38500
+  irDetectSide = IN0
+
+  FREQOUT 9, 1, 38500
+  irDetectBehind = IN10
+
+  DEBUG CRSRXY, 0, 3,
+    "irDetectSide = ", BIN1 irDetectSide, CR,
+    "IN5 = ", BIN1 IN5, CR,
+    "irDetectBehind = ", BIN1 irDetectBehind
+  'DEBUG "irDetectSide = ", BIN1 irDetectSide, CR
+  'PAUSE 10
+
+  'DEBUG "IN5 = ", BIN1 IN5, CR
+  'PAUSE 10
+
+  'DEBUG "irDetectBehind = ", BIN1 irDetectBehind, CR
+  'PAUSE 10
+
+  IF (IN5 = 1) THEN
+      GOSUB BackUp_Long
+  'ELSEIF (IN5 = 0) OR (irDetectSide = 1) AND (irDetectBehind = 1)THEN
+  ENDIF
+  IF (irDetectSide = 0) AND (IN5 = 1) THEN
+    GOSUB Forward_Pulse
+  'ENDIF
+  'IF (irDetectBehind = 1) AND (irdetectSide = 1) THEN
+  ELSEIF (irDetectBehind = 1) AND (irdetectSide = 1) THEN
+    PAUSE 500
+    IF (irDetectBehind = 1) AND (irdetectSide = 1) THEN
+      GOSUB BackUp
+    ENDIF
+  ENDIF
+LOOP
+
+Forward_Pulse:
+  FOR pulseCount = 0 TO 5
+    PULSOUT 13, 850
+    PULSOUT 12, 650
+  NEXT
+  RETURN
+
+BackUP:
+  FOR pulseCount = 0 TO 10
+    PULSOUT 13, 650
+    PULSOUT 12, 850
+  NEXT
+  RETURN
+
+BackUp_Long:
+  FOR pulseCount = 0 TO 50
+    IF(irDetectBehind = 1) THEN
+      PULSOUT 13, 650
+      PULSOUT 12, 850
+    ENDIF
+  NEXT
+  RETURN
