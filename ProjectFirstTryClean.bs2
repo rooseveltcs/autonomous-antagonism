@@ -1,0 +1,58 @@
+' ProjectFirstTryClean.bs2
+' {$STAMP BS2}
+' {$PBASIC 2.5}
+
+irDetectSide  VAR Bit
+irDetectBehind VAR Bit
+pulseCount VAR Byte
+
+DO ' like a while loop this loop is called constantly
+  FREQOUT 2, 1, 38500 ' get data from a sensor and store it in a variable.
+  irDetectSide = IN0
+
+  FREQOUT 9, 1, 38500 ' get data from a sensor and store it in a variable.
+  irDetectBehind = IN10
+
+  DEBUG CRSRXY, 0, 3,                        ' used if testing the range of the sensors when the robot is plugged into the computer.
+    "irDetectSide = ", BIN1 irDetectSide, CR,
+    "IN5 = ", BIN1 IN5, CR,
+    "irDetectBehind = ", BIN1 irDetectBehind
+
+  IF (IN5 = 1) THEN        ' if the bot id running into something forwards
+      GOSUB BackUp_Long
+  ENDIF
+  IF (irDetectSide = 0) AND (IN5 = 1) THEN 'if the sensor sees something
+    GOSUB Forward_Pulse
+  ELSEIF (irDetectBehind = 1) AND (irdetectSide = 1) THEN ' if the sensor sees nothing and there is nothing directly behind the robot
+    PAUSE 500
+    IF (irDetectBehind = 1) AND (irdetectSide = 1) THEN ' if the situation remains the same for half of a second.
+      GOSUB BackUp
+    ENDIF
+  ENDIF
+LOOP
+
+' Drives forward a very tiny distance
+Forward_Pulse:
+  FOR pulseCount = 0 TO 5
+    PULSOUT 13, 850
+    PULSOUT 12, 650
+  NEXT
+  RETURN
+
+' Backs up a fair disatance
+BackUP:
+  FOR pulseCount = 0 TO 10
+    PULSOUT 13, 650
+    PULSOUT 12, 850
+  NEXT
+  RETURN
+
+' Backs up a lot
+BackUp_Long:
+  FOR pulseCount = 0 TO 50
+    IF(irDetectBehind = 1) THEN ' if there is nothing behind the robot.
+      PULSOUT 13, 650
+      PULSOUT 12, 850
+    ENDIF
+  NEXT
+  RETURN
