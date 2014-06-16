@@ -1,0 +1,67 @@
+' Robotics with the Boe-bot - FirstRoundAntagonism.bs2
+' Boe-Bot uses whiskers to detect objects, and navigates around them.
+
+' {$STAMP BS2}
+' {$PBASIC 2.5}
+
+DEBUG "Program Running!"
+
+pulseCount     VAR         Byte            'FOR...NEXT loop counter
+
+FREQOUT 4, 2000, 3000
+
+DO
+  IF (IN5 = 0) AND (IN7 = 0) THEN
+    HIGH 10
+    HIGH 1
+    GOSUB Back_Up
+    GOSUB Turn_Left
+    GOSUB Turn_Left
+  ELSEIF (IN5 = 0) THEN
+    HIGH 10
+    GOSUB Back_Up
+    GOSUB Turn_Right
+  ELSEIF (IN7 = 0) THEN
+    HIGH 1
+    GOSUB Back_Up
+    GOSUB Turn_Left
+  ELSE
+    LOW 10
+    LOW 1
+    GOSUB Forward_Pulse
+  ENDIF
+LOOP
+
+Forward_Pulse:
+  DEBUG "Forward"
+  PULSOUT 13, 850
+  PULSOUT 12, 650
+  PAUSE 20
+  RETURN
+
+Turn_Left:
+  DEBUG "Left"
+  FOR pulseCount = 0 TO 20
+    PULSOUT 13, 850
+    PULSOUT 13, 650
+    PAUSE 20
+  NEXT
+  RETURN
+
+Turn_Right:
+  DEBUG "Right"
+  FOR pulseCount = 0 TO 20
+    PULSOUT 13, 650
+    PULSOUT 13, 850
+    PAUSE 20
+  NEXT
+  RETURN
+
+Back_Up:
+  DEBUG "Backwards"
+  FOR pulseCount = 0 TO 40
+    PULSOUT 13, 650
+    PULSOUT 12, 850
+    PAUSE 20
+  NEXT
+  RETURN
