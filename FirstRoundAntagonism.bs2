@@ -11,39 +11,47 @@ pulseCount     VAR         Byte            'FOR...NEXT loop counter
 FREQOUT 4, 2000, 3000
 
 DO
-  IF (IN5 = 0) AND (IN7 = 0) THEN
-    HIGH 10
+  IF (IN5 = 0) AND (IN7 = 0) THEN          'IF both of the whiskers sense an object in front of the robot
+    HIGH 10                                'THEN make both LEDs flash (they are in ports 10 and 1)
     HIGH 1
-    GOSUB Back_Up
+    GOSUB Back_Up                          'AND Back up once and turn left twice
     GOSUB Turn_Left
     GOSUB Turn_Left
-  ELSEIF (IN5 = 0) THEN
-    HIGH 10
-    GOSUB Back_Up
+  ELSEIF (IN5 = 0) THEN                    'IF the left whisker senses an object in front of the robot
+    HIGH 10                                'THEN make the right LED flash (in port 10)
+    GOSUB Back_Up                          'AND Back up once and turn right once, move forward for 40 pulses and then turn left
     GOSUB Turn_Right
-  ELSEIF (IN7 = 0) THEN
-    HIGH 1
-    GOSUB Back_Up
+    FOR pulseCount = 0 TO 40
+      GOSUB Forward_Pulse
+    NEXT
     GOSUB Turn_Left
-  ELSE
-    LOW 10
-    LOW 1
+  ELSEIF (IN7 = 0) THEN                    'IF the right whisker senses an object in front of the robot
+    HIGH 1                                 'THEN make the left LED flash (in port 1)
+    GOSUB Back_Up                          'AND Back up once and turn left once, move forward for 40 pulses and then turn right
+    GOSUB Turn_Left
+    FOR pulseCount = 0 TO 40
+      GOSUB Forward_Pulse
+    NEXT
+    GOSUB Turn_Right
+  ELSE                                     'IF the previous was not true at all
+    LOW 10                                 'THEN turn off both LEDs (they are in ports 10 and 1)
+    LOW 1                                  'AND move forward
     GOSUB Forward_Pulse
   ENDIF
 LOOP
 
 Forward_Pulse:
   DEBUG "Forward"
-  PULSOUT 13, 850
-  PULSOUT 12, 650
+  PULSOUT 13, 850                          'one motor recieves the highest value of pulses to turn clockwise
+  PULSOUT 12, 650                          'the other motor recieves the highest value of pulses to turn counterclockwise
   PAUSE 20
   RETURN
 
 Turn_Left:
   DEBUG "Left"
   FOR pulseCount = 0 TO 20
-    PULSOUT 13, 850
-    PULSOUT 13, 650
+    PULSOUT 13, 650                        'one motor recieves the highest value of pulses to turn counterclockwise
+    PULSOUT 12, 650                        'the other motor recieves the highest value of pulses to turn counterclockwise
     PAUSE 20
   NEXT
   RETURN
@@ -51,8 +59,8 @@ Turn_Left:
 Turn_Right:
   DEBUG "Right"
   FOR pulseCount = 0 TO 20
-    PULSOUT 13, 650
-    PULSOUT 13, 850
+    PULSOUT 13, 850                        'one motor recieves the highest value of pulses to turn clockwise
+    PULSOUT 12, 850                        'the other motor recieves the highest value of pulses to turn clockwise
     PAUSE 20
   NEXT
   RETURN
@@ -60,8 +68,8 @@ Turn_Right:
 Back_Up:
   DEBUG "Backwards"
   FOR pulseCount = 0 TO 40
-    PULSOUT 13, 650
-    PULSOUT 12, 850
+    PULSOUT 13, 650                        'one motor recieves the highest value of pulses to turn counterclockwise
+    PULSOUT 12, 850                        'the other motor recieves the highest value of pulses to turn clockwise
     PAUSE 20
   NEXT
   RETURN
